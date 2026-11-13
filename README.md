@@ -1,37 +1,45 @@
-## Script that will only run if called directly from interactive command processor session
+# Detect if a batch script runs in a cmd subshell
 
-Script will detect if it's run from non-interactive session (`cmd.exe /c detect-batch-subshell.cmd`) and show approriate error message.
+Detects `cmd.exe /c script.cmd` (how PowerShell, Explorer, etc. start batch files) and exits with an error. Running from an interactive `cmd.exe` session works, even when that session was started from PowerShell
 
-Non-interactive shell includes PowerShell/PowerShell ISE, Explorer, etc... Basically anything that will try to execute script by running it in the separate `cmd.exe` instance.
+Fork of [beatcracker/detect-batch-subshell](https://github.com/beatcracker/detect-batch-subshell) (archived)
 
-Hovewer, dropping into the `cmd.exe` session from PowerShell/PowerShell ISE and executing script there will work.
+## Which script?
 
-## Dependencies
+| Script | Needs |
+|---|---|
+| `detect-batch-subshell.cmd` | `wmic.exe` |
+| `detect_batch_subshell-no_wmic.cmd` | PowerShell 2.0+ |
 
-* [wmic.exe](https://msdn.microsoft.com/en-us/library/aa394531.aspx) - comes with Windows XP Professional and up.
+Microsoft deprecated `wmic` in favor of PowerShell/CIM, and Windows 11 24H2+ no longer installs it by default. On such systems use `no_wmic`
 
-### Example:
+Tested on Win7 x86/x64 (PowerShell 2.0 and 5.1) and Win11 x64
 
-1. Open `cmd.exe`
-2. Type `detect-batch-subshell.cmd`
+## Usage
 
-### Output:
+Paste the script's code at the top of your own batch file, or try it as is:
 
 ```none
-> detect-batch-subshell.cmd
-
+> detect_batch_subshell-no_wmic.cmd
 Running interactively in cmd.exe session.
 ```
 
-### Example:
+```none
+PS > .\detect_batch_subshell-no_wmic.cmd
+detect_batch_subshell-no_wmic.cmd only works if run directly from cmd.exe!
+```
 
-1. Open `powershell.exe`
-2. Type `detect-batch-subshell.cmd`
+## Development
 
-### Output:
+`dev/detect_batch_subshell-no_wmic.debug.cmd` is the source of `detect_batch_subshell-no_wmic.cmd`. Set `DEBUG` to see debug output:
 
 ```none
-PS > detect-batch-subshell.cmd
+set DEBUG=1
+dev\detect_batch_subshell-no_wmic.debug.cmd
+```
 
-detect-batch-subshell.cmd only works if run directly from cmd.exe!
+Don't edit the release script by hand. Regenerate it (strips the debug lines, needs Python 3):
+
+```none
+python dev/strip_debug.py dev/detect_batch_subshell-no_wmic.debug.cmd detect_batch_subshell-no_wmic.cmd
 ```
