@@ -1,5 +1,7 @@
-@echo off
+:: Script used to detect whether it is running in a cmd subshell
+:: Uses wmic which came with WinXP Pro but was removed in Win11 24H2
 
+@echo off
 setlocal EnableDelayedExpansion
 
 :: Dequote path to command processor and this script path
